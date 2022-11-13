@@ -11,7 +11,7 @@ import (
 	"forum.kevin.net/internal/validator"
 )
 
-// Todo struct supports the infromation for the todo todo
+// forum struct supports the infromation for the forum forum
 type Forum struct {
 	ID          int64     `json:"id"`
 	CreatedAt   time.Time `json:"-"`
@@ -43,7 +43,7 @@ type ForumModel struct {
 	DB *sql.DB
 }
 
-// Insert() allows us to create a new todo
+// Insert() allows us to create a new forum
 func (m ForumModel) Insert(forum *Forum) error {
 	query := `
 		INSERT INTO forums (title, category, description, publisher, releasedate)
@@ -74,7 +74,7 @@ func (m ForumModel) Get(id int64) (*Forum, error) {
 		WHERE id = $1
 	`
 
-	//Declaring the Todo varaible to hold the returned data
+	//Declaring the forum varaible to hold the returned data
 	var forum Forum
 
 	//Creating the context
@@ -106,7 +106,7 @@ func (m ForumModel) Get(id int64) (*Forum, error) {
 	return &forum, nil
 }
 
-// Update() allows us to edit/alter a specific todo task
+// Update() allows us to edit/alter a specific forum task
 // Optimistic locking (version number)
 func (m ForumModel) Update(forum *Forum) error {
 	//create a query
@@ -218,7 +218,7 @@ func (m ForumModel) GetAll(title string, category string, description string, fi
 	for rows.Next() {
 		var forum Forum
 
-		//Scanning the valus from the row into the todo struct
+		//Scanning the valus from the row into the forum struct
 		err := rows.Scan(
 			&totalRecords,
 			&forum.ID,
@@ -233,7 +233,7 @@ func (m ForumModel) GetAll(title string, category string, description string, fi
 		if err != nil {
 			return nil, Metadata{}, err
 		}
-		//Add the todo to our slice
+		//Add the forum to our slice
 		forums = append(forums, &forum)
 	}
 	//checking for errors after looping through the result set
@@ -241,6 +241,6 @@ func (m ForumModel) GetAll(title string, category string, description string, fi
 		return nil, Metadata{}, err
 	}
 	metadata := calculateMetaData(totalRecords, filters.Page, filters.PageSize)
-	//returning the slice of todos
+	//returning the slice of forums
 	return forums, metadata, nil
 }

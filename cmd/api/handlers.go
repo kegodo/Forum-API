@@ -27,7 +27,7 @@ func (app *application) createForumHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	//coping the valeus from the input struct to the new todo struct
+	//coping the valeus from the input struct to the new forum struct
 	forum := &data.Forum{
 		Title:       input.Title,
 		Category:    input.Category,
@@ -45,7 +45,7 @@ func (app *application) createForumHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	//Creating a todo element
+	//Creating a forum element
 	err = app.models.Forums.Insert(forum)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -61,7 +61,7 @@ func (app *application) createForumHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// The showentry handler will display an individual todo element
+// The showentry handler will display an individual forum element
 func (app *application) showForumHandler(w http.ResponseWriter, r *http.Request) {
 	//getting the request data from param function
 	id, err := app.readIDParam(r)
@@ -70,7 +70,7 @@ func (app *application) showForumHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	//Fetching the specific todo element
+	//Fetching the specific forum element
 	forum, err := app.models.Forums.Get(id)
 
 	//Handling errors
@@ -91,7 +91,7 @@ func (app *application) showForumHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-// Facilitates an update action to the todo element in the database
+// Facilitates an update action to the forum element in the database
 func (app *application) updateForumHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
@@ -160,7 +160,7 @@ func (app *application) updateForumHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	//Passing the updated todo element to the update() method
+	//Passing the updated forum element to the update() method
 	err = app.models.Forums.Update(forum)
 	if err != nil {
 		switch {
@@ -179,7 +179,7 @@ func (app *application) updateForumHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// To facilitate deletion of a todo element
+// To facilitate deletion of a forum element
 func (app *application) deleteForumHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
@@ -206,7 +206,7 @@ func (app *application) deleteForumHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-// The listTodo handler allows the client to see a listing of todo elements based on a set of criteria
+// The listforum handler allows the client to see a listing of forum elements based on a set of criteria
 func (app *application) listForumHandler(w http.ResponseWriter, r *http.Request) {
 	//creating an input struct to hold our query parameters
 	var input struct {
@@ -241,7 +241,7 @@ func (app *application) listForumHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	//Geting a listing of all todo elements
+	//Geting a listing of all forum elements
 	forums, metadata, err := app.models.Forums.GetAll(input.Title, input.Category, input.Description, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)

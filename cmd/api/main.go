@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"forum.kevin.net/internal/data"
+	_ "github.com/lib/pq"
 )
 
 // configuration settings

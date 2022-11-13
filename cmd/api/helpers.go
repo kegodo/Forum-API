@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"forum.kegodo.net/internal/validator"
+	"forum.kevin.net/internal/validator"
 	"github.com/julienschmidt/httprouter"
 )
 

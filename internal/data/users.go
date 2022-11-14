@@ -32,7 +32,7 @@ type password struct {
 }
 
 // Set stores the hash of the plaintext password
-func (p *password) set(plaintextPassword string) error {
+func (p *password) Set(plaintextPassword string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plaintextPassword), 12)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (m UserModel) Insert(user *User) error {
 	query := `
 	INSERT INTO users (name, email, pasword_hash, activated)
 	VALUES($1, $2, $3, $4)
-	RETURNING id, created_at, version
+	RETURNING id, createdat, version
 	`
 	args := []interface{}{
 		user.Name,

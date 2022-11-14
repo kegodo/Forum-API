@@ -1,0 +1,1 @@
+drop index if exists forums_Title_idx;

@@ -10,6 +10,7 @@ import (
 
 	"forum.kevin.net/internal/data"
 	"forum.kevin.net/internal/jsonlog"
+	"forum.kevin.net/internal/mailer"
 
 	_ "github.com/lib/pq"
 )
@@ -29,6 +30,13 @@ type config struct {
 		burst   int
 		enabled bool
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 // The application version number
@@ -39,6 +47,7 @@ type application struct {
 	config config
 	logger *jsonlog.Logger
 	models data.Models
+	mailer mailer.Mailer
 }
 
 // main
@@ -55,6 +64,12 @@ func main() {
 	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limiter maximum requests per second")
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
+	//These are flags for the mailer
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.mailtrap.io", "SMTP host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "0aa06d58302a21", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "6812fc9deed328", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "OnlyGamersForum <no-reply@forums.kevin.net>", "SMTP sender")
 
 	flag.Parse()
 	// Create a logger
@@ -73,6 +88,7 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: data.NewModels(db),
+		mailer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
 	// Call app.serve() to start the server
 	err = app.serve()

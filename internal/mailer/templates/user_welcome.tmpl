@@ -1,0 +1,36 @@
+{{/* Filename: internal/mailer/templates/user_welcome.tmpl */}}
+{{ define "subject" }}Welcome to OnlyGamersForum!{{ end }}
+{{ define "plainBody" }}
+Hi,
+
+Thank you for singing up for an OnlyGamersForum Account!
+We are excited to have you on board!
+For future reference, please note that your identification number 
+is {{ .ID}}.
+
+Thanks,
+The OnlyGamersForum Team
+{{ end }}
+
+{{ define "htmlBody" }}
+<!doctype html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=deivce-width"/>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+</head>
+
+<body>
+    <p>Hi,</p>
+    <p>Thank you for singing up for an OnlyGamersForum Account!</p>
+    <p>We are excited to have you on board!</p>
+    <p>For future reference, please note that your identification number 
+    is {{ .ID }}.</p>
+
+    <p>Thanks,</p>
+    <p>The OnlyGamersForum Team</p>
+</body>
+</html>
+
+{{ end }}

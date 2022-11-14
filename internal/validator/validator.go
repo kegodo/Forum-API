@@ -1,6 +1,15 @@
 // File: forum/internal/validator/validator.go
 package validator
 
+import (
+	"net/url"
+	"regexp"
+)
+
+var (
+	EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+)
+
 // We create a type that wraps our validation errors map
 type Validator struct {
 	Errors map[string]string
@@ -26,6 +35,17 @@ func In(element string, list ...string) bool {
 		}
 	}
 	return false
+}
+
+// Matches() returns true if a string value matches a specific regex pattern
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
+}
+
+// ValidWebsite() checks if a string value is a valid web URL
+func ValidWebsite(website string) bool {
+	_, err := url.ParseRequestURI(website)
+	return err == nil
 }
 
 // AddError() adds an error entry to the Errors map

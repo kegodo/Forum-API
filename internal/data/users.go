@@ -3,6 +3,7 @@ package data
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"errors"
 	"time"
@@ -70,8 +71,8 @@ func ValidatePasswordPlaintext(v *validator.Validator, password string) {
 }
 
 func ValidateUser(v *validator.Validator, user *User) {
-	v.Check(user.Name != "", "name", "msut be provided")
-	v.Check(len(user.Name) <= 500, "password", "must be at least 500 bytes long")
+	v.Check(user.Name != "", "name", "must be provided")
+	v.Check(len(user.Name) <= 500, "name", "must be at least 500 bytes long")
 
 	//validate the email
 	ValidateEmail(v, user.Email)
@@ -93,7 +94,7 @@ type UserModel struct {
 // Create a new user
 func (m UserModel) Insert(user *User) error {
 	query := `
-	INSERT INTO users (name, email, pasword_hash, activated)
+	INSERT INTO users (name, email, password_hash, activated)
 	VALUES($1, $2, $3, $4)
 	RETURNING id, createdat, version
 	`
@@ -121,7 +122,7 @@ func (m UserModel) Insert(user *User) error {
 // Get user based on their email
 func (m UserModel) GetByEmail(email string) (*User, error) {
 	query := `
-SELECT id, createdat, name, email, pasword_hash, activated, version
+SELECT id, createdat, name, email, password_hash, activated, version
 FROM users
 WHERE email= $1
 `
@@ -150,7 +151,7 @@ WHERE email= $1
 }
 
 // The client can update their info
-func (m UserModel) update(user *User) error {
+func (m UserModel) Update(user *User) error {
 	query := `
 		UPDATE users
 		SET name = $1, email = $2, password_hash = $3, activated = $4, version = version + 1
@@ -180,4 +181,42 @@ func (m UserModel) update(user *User) error {
 	}
 	return nil
 
+}
+
+func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error) {
+	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
+	//setup query
+	query := `
+		SELECT users.id, users.createdat, users.name, users.email,
+		users.password_hash, users.activated, users.version
+		FROM users
+		INNER JOIN tokens
+		ON users.id = tokens.user_id
+		WHERE tokens.hash = $1
+		AND tokens.scope = $2
+		AND tokens.expiry > $3
+	`
+	args := []interface{}{tokenHash[:], tokenScope, time.Now()}
+	var user User
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := m.DB.QueryRowContext(ctx, query, args...).Scan(
+		&user.ID,
+		&user.CreatedAt,
+		&user.Name,
+		&user.Email,
+		&user.Password.hash,
+		&user.Activated,
+		&user.Version,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &user, nil
 }

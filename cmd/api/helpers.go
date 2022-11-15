@@ -145,3 +145,16 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int, v *
 	}
 	return intValue
 }
+
+// background accepts a function as its parameter
+func (app *application) background(fn func()) {
+	go func() {
+		//Recovery from panics
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.PrintError(fmt.Errorf("%s", err), nil)
+			}
+		}()
+		fn()
+	}()
+}

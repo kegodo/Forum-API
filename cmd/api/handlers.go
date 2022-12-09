@@ -135,7 +135,7 @@ func (app *application) updateForumHandler(w http.ResponseWriter, r *http.Reques
 		forum.Title = *input.Title
 	}
 
-	if input.Title != nil {
+	if input.Category != nil {
 		forum.Category = *input.Category
 	}
 
